@@ -1,0 +1,27 @@
+{
+  "name": "coupon-app-backend",
+  "version": "0.1.0",
+  "description": "The back-end server for the PromoPay coupon application.",
+  "main": "index.js",
+  "bin": {
+    "promo-pay": "bin/promo-pay.sh"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "bash npm-scripts/prestart.sh",
+    "start": "bash npm-scripts/start.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oregand/Coupon-App-BackEnd.git"
+  },
+  "author": "Graham Whelan <gawhelan@gmail.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Oregand/Coupon-App-BackEnd/issues"
+  },
+  "homepage": "https://github.com/Oregand/Coupon-App-BackEnd#readme",
+  "dependencies": {
+    "koa": "^1.1.2"
+  }
+}
