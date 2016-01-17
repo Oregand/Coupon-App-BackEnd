@@ -10,5 +10,5 @@ following command in the project root folder:
 
     $ vagrant up
 
-Once the VM has been created the server automatically starts. You can
+When the VM spins up the the server automatically starts. You can
 access the server at the folowing URL: http://localhost:8181.

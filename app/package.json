@@ -3,12 +3,8 @@
   "version": "0.1.0",
   "description": "The back-end server for the PromoPay coupon application.",
   "main": "index.js",
-  "bin": {
-    "promo-pay": "bin/promo-pay.sh"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prestart": "bash npm-scripts/prestart.sh",
     "start": "bash npm-scripts/start.sh"
   },
   "repository": {

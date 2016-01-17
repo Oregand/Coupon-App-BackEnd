@@ -65,7 +65,8 @@ npm install -g nodemon
 (cd "$install_path" && npm install --dev --no-bin-links)
 
 # Install the executable
-(cd "$install_path" && npm link)
+(ln -s "$install_path/bin/promo-pay.sh" "$executable_path")
+chmod a+x ""
 
 # Create the user
 create_user "$username"
