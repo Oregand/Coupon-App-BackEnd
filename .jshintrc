@@ -15,5 +15,6 @@
     "trailing": true,
     "multistr": true,
     "quotmark": "single",
-    "esnext": true
+    "esnext": true,
+    "noyield": true
 }
