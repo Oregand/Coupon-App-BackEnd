@@ -1,9 +1,11 @@
-var config = {
-    port: process.env.PORT || 3000,
+var defaults = require('defaults');
 
-    mongo: {
-        uri: 'promopay:password@localhost:27017/promopay',
-    }
+
+var env = process.env.NODE_ENV || 'development';
+
+var defaultConfig = {
+    env: env,
+    port: process.env.PORT || 3000,
 };
 
-module.exports = config;
+module.exports = defaults(require('./' + env), defaultConfig);

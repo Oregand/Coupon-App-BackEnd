@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Oregand/Coupon-App-BackEnd#readme",
   "dependencies": {
     "co-monk": "^1.0.0",
+    "defaults": "^1.0.3",
     "koa": "^1.1.2",
     "koa-json": "^1.1.1",
     "koa-json-body": "^4.0.0",
