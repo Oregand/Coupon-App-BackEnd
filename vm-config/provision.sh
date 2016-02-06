@@ -13,6 +13,16 @@ log_path="/var/opt/$app_name/log"
 executable_path="/usr/local/bin/$app_name"
 username="$app_name"
 
+# Database config
+db_name="promopay"
+db_port=27017
+
+db_admin_user="admin"
+db_admin_pwd="password"
+
+db_api_user="promopay"
+db_api_pwd="password"
+
 ###############################################################################
 # Utility functions
 function create_user {
@@ -40,6 +50,40 @@ rm /etc/nginx/sites-enabled/default
 nginx_add_site "$project_path/vm-config/nginx/promo-pay.conf" "$app_name.conf"
 
 service nginx restart
+
+###############################################################################
+# Install MongoDB
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" > /etc/apt/sources.list.d/mongodb.list
+
+apt-get update
+apt-get install -y mongodb-org
+
+# Install the config file
+cp "$project_path/vm-config/mongo/mongod.conf" "/etc/mongod.conf"
+
+# Load the new configuration
+service mongod restart
+sleep 1
+
+# Create the db users
+mongo <<EOF
+use admin
+db.createUser({
+    user: "$db_admin_user",
+    pwd: "$db_admin_pwd",
+    roles: [{role: 'root', db: 'admin'}]
+})
+
+db.auth("$db_admin_user", "$db_admin_pwd")
+
+use $db_name
+db.createUser({
+    user: "$db_api_user",
+    pwd: "$db_api_pwd",
+    roles: [{role: 'readWrite', db: "$db_name"}]
+})
+EOF
 
 ###############################################################################
 # Nodejs

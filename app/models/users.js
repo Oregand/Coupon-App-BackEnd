@@ -1,58 +1,26 @@
-/****
- * Place holder model
- */
-var users = [{
-    id: '1',
-    username: 'joe',
-}];
+var users = require('../lib/db').get('users');
 
-var lastId = 1;
 
 function *findUsers() {
-    return users;
+    return yield users.find({});
 }
 
 function *findUserById(id) {
-    for (var i = 0; i < users.length; i++) {
-        if (users[i].id === id) {
-            return users[i];
-        }
-    }
+    return yield users.findById(id);
 }
 
 function *insertUser(data) {
-    var user = {
-        id: (++lastId).toString(),
-        username: data.username,
-    };
-
-    users.push(user);
-
-    return user;
+    // TODO: validation
+    return yield users.insert(data);
 }
 
 function *updateUser(id, data) {
-    var user = yield findUserById(id);
-
-    if (!user) {
-        return null;
-    }
-
-    user.username = data.username;
-    return user;
+    // TODO: validation
+    return users.updateById(id, data);
 }
 
 function *removeUser(id) {
-    var i;
-
-    for (i = 0; i < users.length; ++i) {
-        if (users[i].id === id) {
-            users.splice(i, 1);
-            return true;
-        }
-    }
-
-    return false;
+    return yield users.remove({'_id': id});
 }
 
 
