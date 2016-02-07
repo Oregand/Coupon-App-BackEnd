@@ -9,6 +9,7 @@ module.exports = function (config) {
     router.use(json.request());
     router.use(json.response());
 
+    router.use('/oauth', require('./oauth')(config));
     router.use('/users', require('./users')(config));
 
     return router.routes();

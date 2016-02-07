@@ -93,6 +93,7 @@ apt-get install -y nodejs
 ###############################################################################
 # Build tools (used by some npm packages)
 apt-get install -y build-essential
+npm install -g node-gyp
 
 ###############################################################################
 # Node Inspector
