@@ -4,6 +4,9 @@ var omit = require('omit');
 var password = require('../lib/password');
 var users = require('../lib/db').get('users');
 
+// Ensure 'name' unique
+users.index('name', {unique: true});
+
 
 function *findUsers(query) {
     query = query || {};
