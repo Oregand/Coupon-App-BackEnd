@@ -1,4 +1,4 @@
-var users = require('../../../models/users');
+var tokens = require('../../../models/tokens');
 
 
 function *createToken() {
@@ -19,7 +19,7 @@ function *createToken() {
         this.throw(403);
     }
 
-    token = yield users.createToken(user._id, clientId);
+    token = yield tokens.create(user._id, clientId);
 
     this.body = {
         data: {

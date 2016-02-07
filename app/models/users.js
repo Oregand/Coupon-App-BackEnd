@@ -1,4 +1,3 @@
-var uuid = require('uuid');
 var omit = require('omit');
 
 var password = require('../lib/password');
@@ -50,37 +49,6 @@ function *removeUser(id) {
     return yield users.remove({'_id': id});
 }
 
-function *createTokenForUser(id, clientId) {
-    var user;
-    var token;
-
-    user = yield users.findById(id);
-
-    if (!user) {
-        return null;
-    }
-
-    if (!user.auth) {
-        user.auth = {};
-    }
-
-    if (!user.auth.tokens) {
-        user.auth.tokens = [];
-    }
-
-    token = {
-        value: uuid.v4(),
-        type: 'Bearer',
-        clientId: clientId,
-        createdAt: Math.floor(new Date() / 1000),
-    };
-
-    user.auth.tokens.push(token);
-    yield users.updateById(user._id, user);
-
-    return token;
-}
-
 module.exports = {
     find:           findUsers,
     findOne:        findOneUser,
@@ -88,5 +56,4 @@ module.exports = {
     insert:         insertUser,
     update:         updateUser,
     remove:         removeUser,
-    createToken:    createTokenForUser,
 };
