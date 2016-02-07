@@ -1,12 +1,15 @@
+var assert = require('assert');
 var basicAuth = require('basic-auth');
-
-var password = require('../password');
-var tokens = require('../../models/tokens');
-var users = require('../../models/users');
 
 
 function doBasicAuth(opts) {
+    var deserializeUser;
+
     opts = opts || {};
+
+    deserializeUser = opts.deserializeUser;
+
+    assert(deserializeUser, 'basicAuth: deserializeUser required');
 
     return function *(next) {
         var authUser = basicAuth(this);
@@ -16,12 +19,8 @@ function doBasicAuth(opts) {
             this.throw(401);
         }
 
-        user = yield users.findOne({name: authUser.name});
-        if (!user || !user.auth || !user.auth.hash) {
-            this.throw(401);
-        }
-
-        if (!(yield password.compare(authUser.pass, user.auth.hash))) {
+        user = yield deserializeUser(authUser.name, authUser.pass);
+        if (!user) {
             this.throw(401);
         }
 
@@ -31,11 +30,17 @@ function doBasicAuth(opts) {
 }
 
 function doBearerAuth(opts) {
+    var deserializeUser;
+
     opts = opts || {};
+
+    deserializeUser = opts.deserializeUser;
+
+    assert(deserializeUser, 'bearerAuth: deserializeUser required');
 
     return function *(next) {
         var authHeader;
-        var token, user;
+        var user;
 
         authHeader = this.headers['authorization'];
         if (!authHeader) {
@@ -47,12 +52,7 @@ function doBearerAuth(opts) {
             this.throw(401);
         }
 
-        token = yield tokens.findByValue(authHeader[1]);
-        if (!token) {
-            this.throw(401);
-        }
-
-        user = yield users.findById(token.userId);
+        user = yield deserializeUser(authHeader[1]);
         if (!user) {
             this.throw(401);
         }

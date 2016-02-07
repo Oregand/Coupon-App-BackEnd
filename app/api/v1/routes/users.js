@@ -1,33 +1,40 @@
 var Router = require('koa-router');
+
 var users = require('../controllers/users');
-var auth = require('../../../lib/middleware/auth');
+var auth = require('../../../lib/auth');
+var authorization = require('../../../lib/middleware/authorization');
 
 
 module.exports = function (config) {
     var router = new Router();
+    var requireBearerAuth;
+
+    requireBearerAuth = authorization.bearerAuth({
+        deserializeUser: auth.user.deserializeByToken,
+    });
 
     router.get('/',
-        auth.bearerAuth(),
+        requireBearerAuth,
         users.list
     );
 
     router.get('/:id',
-        auth.bearerAuth(),
+        requireBearerAuth,
         users.get
     );
 
     router.post('/',
-        auth.bearerAuth(),
+        requireBearerAuth,
         users.create
     );
 
     router.put('/:id',
-        auth.bearerAuth(),
+        requireBearerAuth,
         users.update
     );
 
     router.del('/:id',
-        auth.bearerAuth(),
+        requireBearerAuth,
         users.remove
     );
 
