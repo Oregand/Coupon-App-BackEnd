@@ -24,7 +24,6 @@ module.exports = function (config) {
     );
 
     router.post('/',
-        requireBearerAuth,
         users.create
     );
 
