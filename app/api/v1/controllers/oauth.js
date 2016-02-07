@@ -30,5 +30,7 @@ function *createToken() {
 }
 
 module.exports = {
-    token: createToken,
+    tokens: {
+        create: createToken,
+    },
 };

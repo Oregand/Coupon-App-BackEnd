@@ -13,9 +13,9 @@ module.exports = function (config) {
         deserializeUser: auth.user.deserializeByNameAndPassword,
     });
 
-    router.post('/token',
+    router.post('/tokens',
         requireBasicAuth,
-        oauth.token
+        oauth.tokens.create
     );
 
     return router.routes();
