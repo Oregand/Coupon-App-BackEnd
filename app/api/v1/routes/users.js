@@ -37,5 +37,15 @@ module.exports = function (config) {
         users.remove
     );
 
+    router.get('/:id/offers',
+        requireBearerAuth,
+        users.offers.list
+    );
+
+    router.post('/:id/vouchers',
+        requireBearerAuth,
+        users.vouchers.create
+    );
+
     return router.routes();
 };

@@ -21,6 +21,7 @@
     "basic-auth": "^1.0.3",
     "co-bcrypt": "^1.0.0",
     "co-monk": "^1.0.0",
+    "co-request": "^1.0.0",
     "defaults": "^1.0.3",
     "kcors": "^1.0.1",
     "koa": "^1.1.2",

@@ -1,4 +1,6 @@
 var users = require('../../../models/users');
+var phs = require('../../../lib/phs');
+
 
 function *listUsers() {
     var data = yield users.find();
@@ -59,10 +61,54 @@ function *removeUser() {
     this.body = '';
 }
 
+function *listOffers() {
+    var id = this.params.id;
+    var user;
+    var offers;
+
+    user = yield users.findById(id);
+    if (!user) {
+        this.throw('Not Found', 404);
+    }
+
+    offers = yield phs.getOffers(user._id.toString());
+
+    this.body = {
+        data: offers,
+    };
+}
+
+function *createVoucher() {
+    var userId = this.params.id;
+    var offerId = this.request.body.offerId;
+    var user, voucher;
+
+    if (!offerId) {
+        this.thow('Bad Request', 400);
+    }
+
+    user = yield users.findById(userId);
+    if (!user) {
+        this.throw('Not Found', 404);
+    }
+
+    voucher = yield phs.createVoucher(offerId);
+
+    this.body = {
+        data: voucher,
+    };
+}
+
 module.exports = {
     list:   listUsers,
     get:    getUser,
     create: createUser,
     update: updateUser,
     remove: removeUser,
+    offers: {
+        list: listOffers,
+    },
+    vouchers: {
+        create: createVoucher,
+    }
 };
