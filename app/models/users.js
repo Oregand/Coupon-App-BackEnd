@@ -135,7 +135,7 @@ function *updateOffersForUser(id) {
 
     offers = yield phs.getOffers(id.toString());
 
-    simulateUsedVouchers(user.offers);
+    simulateUsedVouchers(offers);
 
     user.offers = offers;//combineOfferArrays(offers, user.offers);
     user.savings = getSavingsForOfferArray(user.offers);
