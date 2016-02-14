@@ -3,7 +3,7 @@ module.exports = function (config) {
         try {
             yield next;
         } catch (err) {
-            err.status = err.status || 500;
+            this.status = err.status || 500;
             this.body = {
                 error: {
                     status: err.status,
