@@ -5,7 +5,7 @@ var users = require('../lib/db').get('users');
 
 
 // Ensure 'name' unique
-users.index('name', {unique: true});
+users.index('userName', {unique: true});
 
 
 function *findUsers(query) {
