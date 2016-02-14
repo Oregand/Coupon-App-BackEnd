@@ -113,7 +113,7 @@ function simulateUsedVouchers(offers) {
 
     for (i = 0; i < offers.length && i < 2; i++) {
         vchr = offers[i].vchr;
-        if (!vchr.spends || !vchr.spends.length) {
+        if (vchr && (!vchr.spends || !vchr.spends.length)) {
             vchr.spends = [{
                 procT: now,
                 finT: now,
