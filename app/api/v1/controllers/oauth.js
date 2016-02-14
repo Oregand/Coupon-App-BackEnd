@@ -25,6 +25,7 @@ function *createToken() {
         data: {
             'access_token': token.value,
             'token_type': token.type,
+            'user_id': user._id,
         },
     };
 }
