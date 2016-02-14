@@ -64,17 +64,16 @@ function *removeUser() {
 function *listOffers() {
     var id = this.params.id;
     var user;
-    var offers;
 
     user = yield users.findById(id);
     if (!user) {
         this.throw('Not Found', 404);
     }
 
-    offers = yield phs.getOffers(user._id.toString());
+    user = yield users.updateOffers(user._id);
 
     this.body = {
-        data: offers,
+        data: user.offers,
     };
 }
 
