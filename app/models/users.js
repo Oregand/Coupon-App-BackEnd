@@ -137,7 +137,7 @@ function *updateOffersForUser(id) {
 
     simulateUsedVouchers(user.offers);
 
-    user.offers = combineOfferArrays(user.offers, offers);
+    user.offers = offers;//combineOfferArrays(offers, user.offers);
     user.savings = getSavingsForOfferArray(user.offers);
 
     yield updateUser(user._id, user);
