@@ -16,12 +16,12 @@ function doBasicAuth(opts) {
         var user;
 
         if (!authUser) {
-            this.throw(401);
+            this.throw('Unauthorized', 401);
         }
 
         user = yield deserializeUser(authUser.name, authUser.pass);
         if (!user) {
-            this.throw(401);
+            this.throw('Unauthorized', 401);
         }
 
         this.request.user = user;
@@ -44,17 +44,17 @@ function doBearerAuth(opts) {
 
         authHeader = this.headers['authorization'];
         if (!authHeader) {
-            this.throw(401);
+            this.throw('Unauthorized', 401);
         }
 
         authHeader = authHeader.trim().split(/\s+/);
         if (authHeader[0] !== 'Bearer' || !authHeader[1]) {
-            this.throw(401);
+            this.throw('Unauthorized', 401);
         }
 
         user = yield deserializeUser(authHeader[1]);
         if (!user) {
-            this.throw(401);
+            this.throw('Unauthorized', 401);
         }
 
         this.request.user = user;

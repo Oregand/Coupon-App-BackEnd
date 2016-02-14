@@ -8,15 +8,15 @@ function *createToken() {
     var token;
 
     if (grant !== 'client_credentials') {
-        this.throw(400, 'Unsupported grant type');
+        this.throw('Unsupported grant type', 400);
     }
 
     if (!clientId) {
-        this.throw(400, 'client_id is required');
+        this.throw('client_id is required', 400);
     }
 
     if (!user) {
-        this.throw(403);
+        this.throw('Unauthorized', 401);
     }
 
     token = yield tokens.create(user._id, clientId);
