@@ -101,6 +101,30 @@ function getSavingsForOfferArray(offers) {
     return savings;
 }
 
+// TODO: remove once testing is complete
+function simulateUsedVouchers(offers) {
+    var vchr;
+    var now = new Date().toISOString();
+    var i;
+
+    if (!offers || !offers.length) {
+        return;
+    }
+
+    for (i = 0; i < offers.length && i < 2; i++) {
+        vchr = offers[i].vchr;
+        if (!vchr.spends || !vchr.spends.length) {
+            vchr.spends = [{
+                procT: now,
+                finT: now,
+                sId: '1',
+                salPntId: '1',
+                salPntType: '1',
+            }];
+        }
+    }
+}
+
 function *updateOffersForUser(id) {
     var user = yield findUserById(id);
     var offers;
@@ -110,6 +134,8 @@ function *updateOffersForUser(id) {
     }
 
     offers = yield phs.getOffers(id.toString());
+
+    simulateUsedVouchers(user.offers);
 
     user.offers = combineOfferArrays(user.offers, offers);
     user.savings = getSavingsForOfferArray(user.offers);
