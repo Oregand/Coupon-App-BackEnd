@@ -31,17 +31,17 @@ function cleanUserData(data) {
 function *findUsers(query) {
     query = query || {};
     return (yield users.find(query)).map((user) => {
-        return omit(user, 'auth');
+        return user;
     });
 }
 
 function *findOneUser(query) {
     query = query || {};
-    return omit(yield users.findOne(query), 'auth');
+    return yield users.findOne(query);
 }
 
 function *findUserById(id) {
-    return omit(yield users.findById(id), 'auth');
+    return yield users.findById(id);
 }
 
 function *insertUser(data) {
@@ -62,7 +62,7 @@ function *insertUser(data) {
 //    data = cleanUserData(data);
 
     try {
-     return omit(yield users.insert(data), 'auth');
+     return yield users.insert(data);
     } catch (err) {
         if (errors.isMongoDuplicateKeyError(err)) {
             throw new errors.DuplicateKeyError('email');
@@ -108,7 +108,7 @@ function *updateUser(id, data) {
         }
     }
 
-    return omit(user, 'auth');
+    return user;
 }
 
 function *removeUser(id) {
