@@ -5,7 +5,7 @@ var tokens = require('../models/tokens');
 function *deserializeUserByNameAndPassword(name, password) {
     var user;
 
-    user = yield users.findOne({userName: name});
+    user = yield users.findOne({email: name});
     if (!user) {
         return null;
     }
