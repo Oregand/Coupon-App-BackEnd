@@ -1,55 +1,120 @@
-var omit = require('omit');
+var pick = require('lodash.pick');
+var omit = require('lodash.omit');
+var defaults = require('lodash.defaults');
+var emailValidator = require('email-validator');
 
+var errors = require('../lib/errors');
 var password = require('../lib/password');
 var users = require('../lib/db').get('users');
 var phs = require('../lib/phs');
 
 
-// Ensure 'name' unique
-users.index('userName', {unique: true});
+// Ensure 'email' is unique
+users.index('email', {unique: true});
 
+
+var validUserProps = [
+    '_id',
+    'name',
+    'userName',
+    'email',
+    'phone',
+    'age',
+    'picture',
+    'auth',
+];
+
+function cleanUserData(data) {
+    return pick(data, validUserProps);
+}
 
 function *findUsers(query) {
     query = query || {};
-    return yield users.find(query);
+    return (yield users.find(query)).map((user) => {
+        return omit(user, 'auth');
+    });
 }
 
 function *findOneUser(query) {
     query = query || {};
-    return yield users.findOne(query);
+    return omit(yield users.findOne(query), 'auth');
 }
 
 function *findUserById(id) {
-    return yield users.findById(id);
+    return omit(yield users.findById(id), 'auth');
 }
 
 function *insertUser(data) {
-    // TODO: validation
+    if (!data) {
+        throw new errors.InternalError('Invalid user data');
+    }
+
+    if (!emailValidator.validate(data.email)) {
+        throw new errors.ValidationError('email');
+    }
 
     if (data.password) {
         data.auth = data.auth || {};
         data.auth.hash = yield password.hash(data.password);
-        data = omit('password', data);
+        data = omit(data, 'password');
     }
 
-    return yield users.insert(data);
+//    data = cleanUserData(data);
+
+    try {
+     return omit(yield users.insert(data), 'auth');
+    } catch (err) {
+        if (errors.isMongoDuplicateKeyError(err)) {
+            throw new errors.DuplicateKeyError('email');
+        } else {
+            throw err;
+        }
+    }
 }
 
 function *updateUser(id, data) {
-    // TODO: validation
+    var user = yield users.findById(id);
 
-    if (data.password) {
-        data.auth = data.auth || {};
-        data.auth.hash = yield password.hash(data.password);
-        data = omit('password', data);
+    if (!user) {
+        return null;
     }
 
-    return users.updateById(id, data);
+    if (!data) {
+        throw new errors.InternalError('Invalid user data');
+    }
+
+    if (data.email && !emailValidator.validate(data.email)) {
+        throw new errors.ValidationError('email');
+    }
+
+    if (data.password) {
+        user.auth = user.auth || {};
+        user.auth.hash = yield password.hash(data.password);
+        data = omit(data, 'password');
+    }
+
+//    data = cleanUserData(data);
+
+    user.auth = defaults(user.auth, data.auth);
+    user = defaults(user, data);
+
+    try {
+        yield users.updateById(user._id, user);
+    } catch (err) {
+        if (errors.isMongoDuplicateKeyError(err)) {
+            throw new errors.DuplicateKeyError('email');
+        } else {
+            throw err;
+        }
+    }
+
+    return omit(user, 'auth');
 }
 
 function *removeUser(id) {
     return yield users.remove({'_id': id});
 }
+
 
 function *verifyPasswordForUser(user, passwd) {
     if (!user || !user.auth || !user.auth.hash || !passwd) {
