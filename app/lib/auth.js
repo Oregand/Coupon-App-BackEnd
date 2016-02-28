@@ -28,10 +28,27 @@ function *deserializeUserByToken(value) {
     return yield users.findById(token.userId);
 }
 
+function *deserializeUserByFacebookToken(token) {
+    if (!token) {
+        return null;
+    }
+
+    return yield users.findOne({'auth.facebook': token});
+}
+
+function *deserializeUserByTwitterToken(token) {
+    if (!token) {
+        return null;
+    }
+
+    return yield users.findOne({'auth.twitter': token});
+}
 
 module.exports = {
     user: {
         deserializeByNameAndPassword: deserializeUserByNameAndPassword,
         deserializeByToken: deserializeUserByToken,
+        deserializeByFacebookToken: deserializeUserByFacebookToken,
+        deserializeByTwitterToken: deserializeUserByTwitterToken,
     },
 };

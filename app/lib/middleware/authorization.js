@@ -2,6 +2,19 @@ var assert = require('assert');
 var basicAuth = require('basic-auth');
 
 
+function cloneWithLowercaseKeys(obj) {
+    var keys = Object.keys(obj);
+    var clone, i, key;
+
+    clone = {};
+    for (i = 0; i < keys.length; i++) {
+        key = keys[i];
+        clone[key.toLowerCase()] = obj[key];
+    }
+
+    return clone;
+}
+
 function doBasicAuth(opts) {
     var deserializeUser;
 
@@ -30,16 +43,16 @@ function doBasicAuth(opts) {
 }
 
 function doBearerAuth(opts) {
-    var deserializeUser;
+    var deserializers;
 
     opts = opts || {};
 
-    deserializeUser = opts.deserializeUser;
+    deserializers = cloneWithLowercaseKeys(opts.deserializers);
 
-    assert(deserializeUser, 'bearerAuth: deserializeUser required');
+    assert(deserializers, 'bearerAuth: deserializers required');
 
     return function *(next) {
-        var authHeader;
+        var authHeader, authType, token;
         var user;
 
         authHeader = this.headers['authorization'];
@@ -48,11 +61,18 @@ function doBearerAuth(opts) {
         }
 
         authHeader = authHeader.trim().split(/\s+/);
-        if (authHeader[0] !== 'Bearer' || !authHeader[1]) {
+        authType = authHeader[0].toLowerCase();
+        token = authHeader[1];
+
+        if (!authHeader[1]) {
             this.throw('Unauthorized', 401);
         }
 
-        user = yield deserializeUser(authHeader[1]);
+        if (!deserializers[authType]) {
+            this.throw('Unauthorized', 401);
+        }
+
+        user = yield deserializers[authType](token);
         if (!user) {
             this.throw('Unauthorized', 401);
         }
@@ -65,4 +85,5 @@ function doBearerAuth(opts) {
 module.exports = {
     basicAuth: doBasicAuth,
     bearerAuth: doBearerAuth,
+
 };
