@@ -10,7 +10,11 @@ module.exports = function (config) {
     var requireBearerAuth;
 
     requireBearerAuth = authorization.bearerAuth({
-        deserializeUser: auth.user.deserializeByToken,
+        deserializers: {
+            'bearer': auth.user.deserializeByToken,
+            'facebook': auth.user.deserializeByFacebookToken,
+            'twitter': auth.user.deserializeByTwitterToken,
+        }
     });
 
     router.get('/',
