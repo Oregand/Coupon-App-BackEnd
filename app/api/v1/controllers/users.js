@@ -1,11 +1,18 @@
+var omit = require('lodash.omit');
+
 var users = require('../../../models/users');
 var phs = require('../../../lib/phs');
 
 
+function cleanUser(user) {
+    return omit(user, 'auth');
+}
+
 function *listUsers() {
     var data = yield users.find();
+
     this.body = {
-        data: data,
+        data: data.map(d => cleanUser(d)),
     };
 }
 
@@ -20,15 +27,18 @@ function *getUser() {
     }
 
     this.body = {
-        data: data,
+        data: cleanUser(data),
     };
 }
 
 function *createUser() {
     var body = this.request.body;
+    var data;
+
+    data = yield users.insert(body);
 
     this.body = {
-        data: yield users.insert(body),
+        data: cleanUser(data),
     };
 }
 
@@ -44,7 +54,7 @@ function *updateUser() {
     }
 
     this.body = {
-        data: data,
+        data: cleanUser(data),
     };
 }
 
