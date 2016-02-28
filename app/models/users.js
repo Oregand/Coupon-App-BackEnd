@@ -1,6 +1,6 @@
-var pick = require('lodash.pick');
 var omit = require('lodash.omit');
-var defaults = require('lodash.defaults');
+var defaultsDeep = require('lodash.defaultsdeep');
+var cloneDeep = require('lodash.clonedeep');
 var emailValidator = require('email-validator');
 
 var errors = require('../lib/errors');
@@ -12,21 +12,6 @@ var phs = require('../lib/phs');
 // Ensure 'email' is unique
 users.index('email', {unique: true});
 
-
-var validUserProps = [
-    '_id',
-    'name',
-    'userName',
-    'email',
-    'phone',
-    'age',
-    'picture',
-    'auth',
-];
-
-function cleanUserData(data) {
-    return pick(data, validUserProps);
-}
 
 function *findUsers(query) {
     query = query || {};
@@ -59,8 +44,6 @@ function *insertUser(data) {
         data = omit(data, 'password');
     }
 
-//    data = cleanUserData(data);
-
     try {
      return yield users.insert(data);
     } catch (err) {
@@ -87,16 +70,24 @@ function *updateUser(id, data) {
         throw new errors.ValidationError('email');
     }
 
+    // Clone data as we will be mutating it
+    data = cloneDeep(data);
+
+    data.auth = data.auth || {};
+
+    // Don't allow mudification of _id
+    delete data._id;
+
+    // Don't allow modification of password hash value
+    delete data.auth.hash;
+
+    // hash the password if provided
     if (data.password) {
-        user.auth = user.auth || {};
-        user.auth.hash = yield password.hash(data.password);
-        data = omit(data, 'password');
+        data.auth.hash = yield password.hash(data.password);
+        delete data.password;
     }
 
-//    data = cleanUserData(data);
-
-    user.auth = defaults(user.auth, data.auth);
-    user = defaults(user, data);
+    user = defaultsDeep(data, user);
 
     try {
         yield users.updateById(user._id, user);
@@ -122,28 +113,6 @@ function *verifyPasswordForUser(user, passwd) {
     }
 
     return yield password.verify(passwd, user.auth.hash);
-}
-
-function combineOfferArrays(existingOffers, newOffers) {
-    var combinedOffers = [];
-    var existingIds = [];
-
-    if (Array.isArray(existingOffers)) {
-        existingOffers.forEach(offer => {
-            combinedOffers.push(offer);
-            existingIds.push(offer.id);
-        });
-    }
-
-    if (Array.isArray(newOffers)) {
-        newOffers.forEach(offer => {
-            if (existingIds.indexOf(offer.id) === -1) {
-                combinedOffers.push(offer);
-            }
-        });
-    }
-
-    return combinedOffers;
 }
 
 function getSavingsForOfferArray(offers) {
@@ -202,7 +171,7 @@ function *updateOffersForUser(id) {
 
     simulateUsedVouchers(offers);
 
-    user.offers = offers;//combineOfferArrays(offers, user.offers);
+    user.offers = offers;
     user.savings = getSavingsForOfferArray(user.offers);
 
     yield updateUser(user._id, user);
