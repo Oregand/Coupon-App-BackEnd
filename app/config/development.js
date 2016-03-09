@@ -6,7 +6,7 @@ var config = {
     },
 
     phs: {
-        baseUrl: 'http://www.rglhosting2.com/validation.3.0.dag/mobile.svc'
+        baseUrl: 'http://40.115.48.100/vouchers.3.0/mobile.svc'
     },
 };
 
